@@ -241,9 +241,9 @@ export default {
         })
         .then((Response) => {
           if (Response.data.code === 200) {
-            console.log("登录为" + Response.data.data.currentUser.username);
+            console.log("登录为" + Response.data.data.username);
             //将登陆状态放入store
-            that.$store.commit("setuser", Response.data.data.currentUser);
+            that.$store.commit("setuser", Response.data.data);
             val = true;
           } else {
             console.log(
