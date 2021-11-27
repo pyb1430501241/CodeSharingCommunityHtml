@@ -76,24 +76,24 @@ export default {
       let session = this.$store.getters.getsessionId;
       let val = true;
       axios
-        .get("/user/loginstatus", {
+        .get("/nav", {
           params: {},
           headers: {
             Authorization: session,
           },
         })
         .then((Response) => {
-          if (Response.data.json.code == 200) {
-            console.log("username=" + Response.data.json.user.username);
+          if (Response.data.code == 200) {
+            console.log("username=" + Response.data.data.username);
             //将登陆状态放入store
-            that.$store.commit("setuser", Response.data.json.user);
+            that.$store.commit("setuser", Response.data.data);
             val = true;
           } else {
             alert(
-              Response.data.json.code + "..." + Response.data.json.exception
+              Response.data.code + "..." + Response.data.msg
             );
             this.$store.commit("setsessionId", "");
-            document.cookie = "Authorization='',path=/";
+            document.cookie = "";
             val = false;
           }
         })

@@ -43,6 +43,8 @@
 </template>
 <script>
 import axios from "axios";
+import cookie from '../store/cookie'
+import request from '../store/request'
 import store from "../store";
 import qs from "qs";
 export default {
@@ -66,8 +68,7 @@ export default {
     exit() {
       let that = this;
       axios
-        .get("/user/logout", {
-          params: {},
+        .post("/logout", {
           headers: {
             //必须加Authorization请求头
             Authorization: this.AccessToken,
@@ -78,6 +79,7 @@ export default {
           // document.cookie = "Authorization=" + "; path=/;";
           that.$store.commit("setuser", "");
           that.$store.commit("setsessionId", "");
+          document.cookie = "";
         })
         .catch((error) => {
           console.log(error);
@@ -124,12 +126,13 @@ export default {
              * 记录sessionId
              *  cookie与store
              */
-            console.log("AccessToken=" + Response.data.data.token);
-            console.log(document.cookie);
+            // console.log("AccessToken=" + Response.data.data.token);
+            // console.log(document.cookie);
             that.AccessToken = Response.data.data.token;
 
-            // document.cookie =
-            //   "Authorization=" + Response.data.json.AccessToken + "; path=/;";
+            if(that.user.flag === 1) {
+              cookie.setCookie("authorization", Response.data.data.token, 28);
+            }
 
             that.$store.commit("setsessionId", Response.data.data.token);
             /**
@@ -158,7 +161,7 @@ export default {
               // alert(Response.data.json.exception);
               this.$message({
                 showClose: true,
-                message: Response.data.json.exception,
+                message: Response.data.msg,
                 type: "success",
               });
               that.$router.push({ path: "/LoggingStatus/PersonalCenter" });
@@ -215,7 +218,7 @@ export default {
      * 检查cookie，判断是否已登陆
      */
     firstCheck() {
-      if (this.loginstatus()) {
+      if (request.loginStatus()) {
         // this.AccessToken = one[1];
         //验证已登录后，由store中sessionId获取登录状态,将登陆状态放入store
         this.$router.push({
@@ -225,38 +228,7 @@ export default {
         console.log("Rogon登录为空");
       }
     },
-    /**
-     * 验证已登录后，由store中sessionId获取登录状态,将登陆状态放入store
-     */
-    loginstatus() {
-      let that = this;
-      let session = this.$store.getters.getsessionId;
-      let val = false;
-      axios
-        .get("/nav", {
-          params: {},
-          headers: {
-            authorization: session,
-          },
-        })
-        .then((Response) => {
-          if (Response.data.code === 200) {
-            console.log("登录为" + Response.data.data.username);
-            //将登陆状态放入store
-            that.$store.commit("setuser", Response.data.data);
-            val = true;
-          } else {
-            console.log(
-              Response.data.code + "..." + Response.data.msg
-            );
-            val = false;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      return val;
-    },
+   
   },
   created() {
     /**

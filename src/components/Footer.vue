@@ -6,6 +6,8 @@
   </footer>
 </template>
 <script>
+import cookie from '../store/cookie'
+
 export default {
   data() {
     return {
@@ -17,7 +19,7 @@ export default {
     };
   },
   mounted() {
-    if (this.$store.getters.getsessionId != "") {
+    if (cookie.getCookie('authorization') != "") {
       this.user_serve_url = "/#/LoggingStatus/UserAgreement";
     }
   },

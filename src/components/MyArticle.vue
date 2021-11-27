@@ -2,14 +2,15 @@
   <div class="my_article">
     <ul>
       <li v-for="(aitem, aindex) in list" :key="aindex">
-        <h5 @click="resolve(aitem.web.id)">{{ aitem.web.title }}</h5>
-        <a @click="deleteblob(aitem.web.id)" class="del">删除</a>
-        <a @click="updatablob(aitem.web.id)" class="upd">编辑</a>
+        <h5 @click="resolve(aitem.blob.id)">{{ aitem.blob.title }}</h5>
+        <a @click="deleteblob(aitem.blob.id)" class="del">删除</a>
+        <a @click="updatablob(aitem.blob.id)" class="upd">编辑</a>
         <div class="otherwise">
-          <span class="biao">{{ aitem.web.type }}</span>
+          <span class="biao">{{ aitem.blob.type }}</span>
           <span>阅读:{{ aitem.visit }}</span>
-          <span>{{ aitem.web.subTime }}</span>
-          <!-- <span>点赞:{{ item.thubms }}</span> -->
+          <span>点赞:{{ aitem.thubms }}</span>
+          <span>收藏:{{ aitem.collection }}</span>
+          <span>{{ aitem.blob.createTime }}</span>
         </div>
       </li>
     </ul>
@@ -54,12 +55,12 @@ export default {
           Axios.post(
             "/blob/delete",
             qs.stringify({
-              webid: webid,
+              id: webid,
             }),
             { headers: { Authorization: this.$store.getters.getsessionId } }
           ).then((Response) => {
             // console.log(Response.data.json);
-            switch (Response.data.json.code) {
+            switch (Response.data.code) {
               case 200:
                 this.$message({
                   message: "删除博客成功",
@@ -100,24 +101,25 @@ export default {
      */
     getoneselfblobs() {
       let that = this;
-      Axios.get("/user/getoneselfblobs", {
-        params: {
+      Axios.post("/blob/getBlobs", 
+        {
           p: 1,
-        },
-        headers: { Authorization: this.$store.getters.getsessionId },
-      })
+        }, {
+          headers: { Authorization: this.$store.getters.getsessionId },
+        }
+      )
         .then((Response) => {
           // console.log(Response.data.json.blobList);
-          switch (Response.data.json.code) {
+          switch (Response.data.code) {
             case 200:
               {
-                that.hasNextPage = Response.data.json.hasNextPage;
-                that.list = [...[], ...Response.data.json.blobList];
+                that.hasNextPage = Response.data.data.hasNextPage;
+                that.list = [...[], ...Response.data.data.records];
                 for (const key in that.list) {
-                  if (that.list[key].web.contype == "1") {
-                    that.list[key].web.type = "原创";
+                  if (that.list[key].blob.type === 1) {
+                    that.list[key].blob.type = "原创";
                   } else {
-                    that.list[key].web.type = "转载";
+                    that.list[key].blob.type = "转载";
                   }
                 }
               }

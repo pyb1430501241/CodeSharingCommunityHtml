@@ -39,12 +39,14 @@ export default {
      */
     getoneselffans() {
       let that = this;
-      Axios.get("/user/getoneselffans", {
-        params: {
+      Axios.post("/user/fans", 
+        {
           p: 1,
-        },
-        headers: { Authorization: this.$store.getters.getsessionId },
-      })
+        },{
+
+          headers: { Authorization: this.$store.getters.getsessionId },
+        }
+      )
         .then((Response) => {
           console.log(Response.data.json);
           switch (Response.data.json.code) {

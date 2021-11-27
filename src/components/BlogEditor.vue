@@ -17,7 +17,7 @@
             :key="index"
             :value="item.id"
           >
-            {{ item.contype }}
+            {{ item.type }}
           </option>
         </select>
         <button type="submit" @click="dialogVisible = true">提交发布</button>
@@ -141,24 +141,25 @@ export default {
     // getcontype获取标签
     getcontype() {
       var that = this;
-      Axios.get("/blob/getcontype", {
+      Axios.get("/blob/types", {
         headers: {
+          authorization : this.$store.getters.getsessionId,
           "X-Requested-With": "XMLHttpRequest",
         },
       }).then((response) => {
-        console.log(response.data.json.contypeList);
-        that.contypeList = [...[], ...response.data.json.contypeList];
+        console.log(response.data.data);
+        that.contypeList = [...[], ...response.data.data];
       });
     },
     // getlabel获取标签
     getlabel() {
       var that = this;
-      Axios.get("/blob/getlabel", {
+      Axios.get("/blob/labels", {
         headers: {
           "X-Requested-With": "XMLHttpRequest",
         },
       }).then((response) => {
-        that.labelList = [...[], ...response.data.json.labelList.list];
+        that.labelList = [...[], ...response.data.data];
       });
     },
     // 弹出框取消事件函数
@@ -172,40 +173,35 @@ export default {
       let sessionid = this.$store.getters.getsessionId;
       // console.log("id=" + sessionid);
       this.contype = document.getElementById("select").value;
-      console.log(this.contype);
+
       Axios.post(
         "/blob/contribution",
-        qs.stringify({
+        {
           title: that.title,
-          contype: that.contype,
-          webDataString: that.webDataString,
-          labelList: that.checkedLabels.toString(),
-        }),
-        { headers: { Authorization: this.$store.getters.getsessionId } }
+          type: that.contype,
+          data: that.webDataString,
+          labelIds: that.checkedLabels,
+        },
+        { headers: { authorization: sessionid } }
       )
         .then((Response) => {
-          console.log(Response.data);
-          if (Response.data.json.code == 200) {
+
+          if (Response.data.code == 200) {
             that.$message({
               showClose: true,
               message:
-                Response.data.json.msg +
-                "...ID=" +
-                Response.data.json.webid +
-                "查看",
+                "发布成功",
               type: "success",
             });
 
             this.$router.push({
-              path: `/LoggingStatus/BlogArticle/${Response.data.json.webid}`,
+              path: `/LoggingStatus/BlogArticle/${Response.data.data}`,
             });
           } else {
             that.$message({
               showClose: true,
               message:
-                Response.data.json.code +
-                "...发布..." +
-                Response.data.json.exception,
+                Response.data.msg,
               type: "error",
             });
           }
@@ -276,20 +272,18 @@ export default {
       })
         .then((Response) => {
           // console.log(Response.data.json);
-          if (Response.data.json.code == 200) {
-            that.web = { ...that.web, ...Response.data.json.web };
-            // that.webList = [...that.webList, ...Response.data.json.webList];
-            // that.author = { ...that.author, ...Response.data.json.author };
-            that.visit = Response.data.json.visit;
-            that.thubms = Response.data.json.thubms;
-            that.collection = Response.data.json.collection;
-            that.commentList = [
-              ...that.commentList,
-              ...Response.data.json.commentList,
-            ];
+          if (Response.data.code == 200) {
+            that.web = { ...that.web, ...Response.data.data };
+            that.visit = Response.data.data.visit;
+            that.thubms = Response.data.data.thubms;
+            that.collection = Response.data.data.collection;
+            // that.commentList = [
+            //   ...that.commentList,
+            //   ...Response.data.json.commentList,
+            // ];
             that.title = that.web.title;
-            that.webDataString = that.web.webDataString;
-            that.contype = that.web.contype;
+            that.webDataString = that.web.data;
+            that.contype = that.web.type;
           } else {
             console.log(
               Response.data.json.code + "..." + Response.data.json.exception

@@ -31,18 +31,18 @@
                 item.user.username
               }}</b>
             </span>
-            <span id="time">{{ item.web.subTime }}</span>
+            <span id="time">{{ item.blob.createTime }}</span>
           </div>
           <div class="wname">
             <img
-              :src="'http://121.199.27.93/user/image/' + item.user.imgpath"
+              :src="'http://localhost/user/image/' + item.user.imgPath"
               alt="头像"
             />
             <!-- <a @click="changego(href+item.web.id)"> -->
-            <a :href="href + '/BlogArticle/' + item.web.id" target="_blank">
+            <a :href="href + '/BlogArticle/' + item.blob.id" target="_blank">
               <!-- <a href="href+item.web.id"> -->
-              <b>{{ item.web.type }}</b>
-              {{ item.web.title }}
+              <b>{{ item.blob.type }}</b>
+              {{ item.blob.title }}
             </a>
           </div>
           <div class="otherwise">
@@ -95,6 +95,7 @@
 </template>
 <script>
 import Axios from "axios";
+import cookie from '../store/cookie'
 import store from "../store";
 export default {
   data() {
@@ -129,13 +130,13 @@ export default {
     // getlabel获取标签
     getlabel() {
       var that = this;
-      Axios.get("/blob/getlabel", {
+      Axios.get("/blob/labels", {
         headers: {
           "X-Requested-With": "XMLHttpRequest",
         },
       }).then((response) => {
-        console.log(response.data.json.labelList);
-        that.labelList = [...[], ...response.data.json.labelList.list];
+        console.log(response.data.data);
+        that.labelList = [...[], ...response.data.data];
       });
     },
     //getlid根据标签获取文章内容
@@ -148,6 +149,7 @@ export default {
       console.log(this.labelList[id - 1].label);
       this.list = [...[]];
       this.pageNum = 1;
+      this.hasNextPage = true;
       this.refresh();
     },
     /**
@@ -162,31 +164,31 @@ export default {
      */
     getwebindex() {
       let that = this;
-      Axios.get("/blob/getwebindex", {
-        params: {
+      Axios.post("/blob/index", {
           p: 1,
+        },{
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          }
         },
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-        },
-      })
+      )
         .then((Response) => {
           if (Response.data.code == 200) {
-            console.log(Response.data.json.blobList);
-            that.hasNextPage = Response.data.json.hasNextPage;
-            that.list = [...[], ...Response.data.json.blobList];
+            that.hasNextPage = Response.data.data.hasNextPage;
+            that.list = [...[], ...Response.data.data.records];
+            console.log(that.list)
             that.pageNum = that.pageNum + 1;
             that.oldlist = [];
             for (const iter of that.list) {
-              if (iter.web.contype == 1) {
-                iter.web.type = "原创";
+              if (iter.blob.type == 1) {
+                iter.blob.type = "原创";
               } else {
-                iter.web.type = "转载";
+                iter.blob.type = "转载";
               }
             }
           } else {
             console.log(
-              Response.data.json.code + "..." + Response.data.json.exception
+              Response.data.code + "..." + Response.data.msg
             );
           }
         })
@@ -232,38 +234,37 @@ export default {
       let that = this;
       if (!this.hasNextPage) return;
       console.log("lid=" + this.lid);
-      Axios.get("/blob/getwebindex", {
-        params: {
+      Axios.post("/blob/index", {
           p: that.pageNum,
           lid: that.lid,
-        },
+        },{
         headers: {
           "X-Requested-With": "XMLHttpRequest",
-        },
+        }
       })
         .then((Response) => {
-          if (Response.data.json.code == 200) {
-            let list = [...[], ...Response.data.json.blobList];
-            that.hasNextPage = Response.data.json.hasNextPage;
+          if (Response.data.code == 200) {
+            let list = [...[], ...Response.data.data.records];
+            that.hasNextPage = Response.data.data.hasNextPage;
             that.pageNum = that.pageNum + 1;
 
             for (const iter of list) {
-              if (iter.web.contype == 1) {
-                iter.web.type = "原创";
+              if (iter.blob.contype == 1) {
+                iter.blob.type = "原创";
               } else {
-                iter.web.type = "转载";
+                iter.blob.type = "转载";
               }
             }
             document.getElementById("palert").style.display = "none";
             that.list = [...that.list, ...list.reverse()];
-          } else if (Response.data.json.code == 202) {
+          } else if (Response.data.code == 404) {
             document.getElementById("palert").style.display = "block";
             console.log(
-              Response.data.json.code + "..." + Response.data.json.msg
+              Response.data.code + "..." + Response.data.msg
             );
           } else {
             console.log(
-              Response.data.json.code + "..." + Response.data.json.exception
+              Response.data.code + "..." + Response.data.msg
             );
           }
           // 允许refresh()加载数据函数触发
@@ -276,7 +277,7 @@ export default {
   },
   mounted() {
     document.title = "代码共享社区 - CodeSharingCommunity";
-    if (this.$store.getters.getsessionId != "") {
+    if (cookie.getCookie('authorization')) {
       this.href = "/#/LoggingStatus";
     }
     this.getwebindex();
@@ -289,6 +290,9 @@ export default {
 
 <style scoped>
 #content {
+  background: url('../assets/0072Vf1pgy1foxkgbgscjj31hc0u0k39.png');
+  background-size:100% 80%;
+  overflow: hidden;
   display: flex;
   /* overflow: scroll; */
   min-height: calc(100vh - 112px);
@@ -300,7 +304,8 @@ export default {
   background-color: #eeeeee;
   margin: 0;
   padding: 0;
-  box-shadow: 0 0 10px 0 #333333;
+  display: flex;
+  box-shadow: 0 10px 10px 0 #333333;
 }
 #tuijian_wenzhang {
   position: relative;
@@ -311,11 +316,12 @@ export default {
   padding: 0;
 }
 #tuijian_yonghu {
+  display: flex;
   width: 20%;
   background-color: #eeeeee;
   margin: 0;
   padding: 0;
-  box-shadow: 0 0 10px 0 #333333;
+  box-shadow: 0 10px 10px 0 #333333;
 }
 
 ul li {

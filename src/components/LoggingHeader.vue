@@ -79,10 +79,12 @@ export default {
       }
       // console.log("accessToken=" + accessToken);
       axios
-        .get("/user/logout", {
+        .post("/logout", {
+          
+        },{
           headers: {
-            //必须加Authorization请求头
-            Authorization: accessToken,
+            authorization: this.$store.getters.getsessionId,
+            "X-Requested-With": "XMLHttpRequest",
           },
         })
         .then((Response) => {

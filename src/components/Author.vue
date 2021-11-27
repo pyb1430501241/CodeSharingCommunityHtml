@@ -1,44 +1,44 @@
 <template>
   <div id="author">
     <div class="content">
-      <img class="img" :src="author.imgpath" alt />
+      <img class="img" :src="author.imagePath" alt />
       <h3>{{ author.username }}</h3>
       <div class="data">
         <ul>
           <li>
-            <b>{{ author.original }}</b>
+            <b>{{ author.originalNumber }}</b>
             <b>原创</b>
           </li>
           <li>
-            <b>{{ author.files }}</b>
+            <b>{{ author.fileNumber }}</b>
             <b>文件</b>
           </li>
           <li>
-            <b>{{ author.visits }}</b>
+            <b>{{ author.visitNumber }}</b>
             <b>访问</b>
           </li>
           <li>
-            <b>{{ author.downloads }}</b>
+            <b>{{ author.downloadNumber }}</b>
             <b>下载</b>
           </li>
           <li>
-            <b>{{ author.collection }}</b>
+            <b>{{ author.collectionNumber }}</b>
             <b>收藏</b>
           </li>
           <li>
-            <b>{{ author.thumbs }}</b>
+            <b>{{ author.thumbsNumber }}</b>
             <b>点赞</b>
           </li>
           <li>
-            <b>{{ author.attention }}</b>
+            <b>{{ author.attentionNumber }}</b>
             <b>关注</b>
           </li>
           <li>
-            <b>{{ author.fans }}</b>
+            <b>{{ author.fansNumber }}</b>
             <b>粉丝</b>
           </li>
           <li>
-            <b>{{ author.comment }}</b>
+            <b>{{ author.commentNumber }}</b>
             <b>评论</b>
           </li>
         </ul>
@@ -88,7 +88,7 @@ export default {
     //getauthor获取作者信息
     getauthor() {
       let that = this;
-      Axios.get("/blob/getauthor", {
+      Axios.get("/user/author", {
         params: {
           uid: this.$route.params.uid,
         },
@@ -98,10 +98,10 @@ export default {
       })
         .then((Response) => {
           // console.log(Response.data.json);
-          if (Response.data.json.code == 200) {
-            that.author = { ...{}, ...Response.data.json.author };
-            that.author.imgpath =
-              "http://121.199.27.93/user/image/" + that.author.imgpath;
+          if (Response.data.code == 200) {
+            that.author = { ...{}, ...Response.data.data };
+            that.author.imagePath =
+              "http://localhost/user/image/" + that.author.imagePath;
             //占坑
             that.zhankeng = "*";
             var titstr = that.author.username + " - CodeSharingCommunity";
@@ -159,7 +159,7 @@ export default {
     },
   },
   mounted() {
-    document.title = "Author - 代码共享社区 - CodeSharingCommunity";
+    document.title = "作者 - 代码共享社区 - CodeSharingCommunity";
     if (this.$store.getters.getsessionId != "") {
       this.href = "/#/LoggingStatus";
     }

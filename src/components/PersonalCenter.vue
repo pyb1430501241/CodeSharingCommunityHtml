@@ -109,9 +109,12 @@ export default {
 
 <style scoped>
 #personalcenter {
+  background: url('../assets/0072Vf1pgy1foxlna4bcfj31kw0w0h96.png');
+  background-size:100% 100%;
   min-height: calc(100vh - 112px);
   background-color: brown;
   display: flex;
+  overflow: hidden;
   padding: 0 15%;
   background-color: rgb(59, 58, 58);
 }

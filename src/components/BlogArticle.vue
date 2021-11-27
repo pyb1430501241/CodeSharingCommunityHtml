@@ -2,7 +2,7 @@
   <div id="blog_article">
     <div id="left_content">
       <div id="the_author">
-        <div class="head_name">
+        <div class="head_name" >
           <div class="head_portrait">
             <a id="himg" :href="href + href2 + author.uid">
               <img class="himg" :src="author.imgpath" alt />
@@ -12,7 +12,7 @@
             <a id="aname" :href="href + href2 + author.uid">{{
               author.username
             }}</a>
-            <span @click="like" id="like">关注</span>
+            <span @click="like" id="like">{{ likeDisplay }}</span>
           </div>
         </div>
         <div class="dls">
@@ -22,26 +22,26 @@
               target="_blank"
               style="text-decoration: none"
             >
-              <dt>{{ author.original }}</dt>
+              <dt>{{ author.originalNumber }}</dt>
               <dd>原创</dd>
             </a>
           </dl>
           <dl>
-            <dt>{{ author.downloads }}</dt>
+            <dt>{{ author.downloadNumber }}</dt>
             <dd>下载</dd>
           </dl>
           <dl>
-            <dt>{{ author.visits }}</dt>
+            <dt>{{ author.visitNumber }}</dt>
             <dd>访问量</dd>
           </dl>
           <dl>
-            <dt>{{ author.attention }}</dt>
+            <dt>{{ author.attentionNumber }}</dt>
             <dd>关注</dd>
           </dl>
         </div>
         <div class="dls">
           <dl>
-            <dt>{{ author.thumbs }}</dt>
+            <dt>{{ author.thumbsNumber }}</dt>
             <dd>点赞</dd>
           </dl>
           <dl>
@@ -50,16 +50,16 @@
               target="_blank"
               style="text-decoration: none"
             >
-              <dt>{{ author.fans }}</dt>
+              <dt>{{ author.fansNumber }}</dt>
               <dd>粉丝</dd>
             </a>
           </dl>
           <dl>
-            <dt>{{ author.collection }}</dt>
+            <dt>{{ author.collectionNumber }}</dt>
             <dd>收藏</dd>
           </dl>
           <dl>
-            <dt>{{ author.comment }}</dt>
+            <dt>{{ author.commentNumber }}</dt>
             <dd>评论</dd>
           </dl>
         </div>
@@ -72,22 +72,22 @@
         </li>
       </ul>
       <div class="othershow">
-        <img src="../assets/caotu.png" />
+        <img src="../assets/0072Vf1pgy1foxkgbgscjj31hc0u0k39.png" />
       </div>
     </div>
     <div class="article">
       <div id="article_title">
         <h1>{{ web.title }}</h1>
         <div id="otherwise">
-          <span class="biao">{{ contype }}</span>
+          <span class="biao">{{ web.type }}</span>
           <div class="tcv">
-            <img @click="thumbs" src="../assets/good.svg" alt />
-            <span id="thubm" @click="thumbs">{{ thubms }}</span>
+            <img @click="thumbs" src="../assets/good.svg" alt>
+            <span id="thubm">点赞:{{ web.thumbs }}</span>
           </div>
-          <span class="visi">阅读量:{{ visit }}</span>
+          <span class="visi">阅读:{{ web.visit }}</span>
           <div class="tcv">
             <img @click="blobcollection" src="../assets/favorites.svg" alt />
-            <span id="col">{{ collection }}</span>
+            <span id="col">收藏:{{ web.collection }}</span>
           </div>
           <b
             @click="
@@ -100,7 +100,7 @@
       </div>
       <mavon-editor
         class="md"
-        v-model="web.webDataString"
+        v-model="web.data"
         codeStyle="atom-one-light"
         :subfield="false"
         :defaultOpen="'preview'"
@@ -147,10 +147,6 @@ export default {
         imgpath: require("../assets/user.svg"),
       },
       commentList: [],
-      contype: "类型",
-      visit: "",
-      thubms: "",
-      collection: "",
       //占坑
       zhankeng: "",
       htmlcontent: "",
@@ -159,6 +155,7 @@ export default {
       href: "/#/HelloWorld",
       href2: "/Author/",
       imgsrc: require("../assets/prompt.svg"),
+      likeDisplay: "关注"
     };
   },
   methods: {
@@ -174,26 +171,39 @@ export default {
         return;
       }
       Axios.post(
-        "/user/like",
-        qs.stringify({
-          uid: this.author.uid,
-        }),
+        "/blob/reversal", 
+        {
+          likeId: this.author.uid,
+          type: 'like'
+        },
         { headers: { Authorization: this.$store.getters.getsessionId } }
       )
         .then((Response) => {
           // console.log(Response.data.json);
-          switch (Response.data.json.code) {
+          switch (Response.data.code) {
             case 200:
+              if(Response.data.data.status) {
+                document.getElementById("like").style.color = "dimgray";
+                document.getElementById("like").classList.remove("likeshow");
+                document.getElementById("like").classList.add("like_dimgray");
+                that.likeDisplay = "已关注";
+                that.author.fansNumber++;
+              } else {
+                document.getElementById("like").style.color = "dodgerblue";
+                document.getElementById("like").classList.remove("like_dimgray");
+                document.getElementById("like").classList.add("likeshow");
+                that.likeDisplay = "关注";
+                that.author.fansNumber--;
+              }
               that.$message({
-                message: "关注成功",
+                message: Response.data.data.msg,
                 type: "success",
               });
-              // alert("关注..." + Response.data.json.msg);
               break;
 
             default:
               that.$message({
-                message: "关注..." + Response.data.json.exception,
+                message: Response.data.msg,
               });
               // alert("关注..." + Response.data.json.exception);
               break;
@@ -216,27 +226,35 @@ export default {
         return;
       }
       Axios.post(
-        "/blob/thumbs",
-        qs.stringify({
-          webid: this.webid,
+        "/blob/reversal",
+        {
+          webId: this.webid,
           bid: this.author.uid,
-        }),
+          type: 'thumbs'
+        },
         { headers: { Authorization: this.$store.getters.getsessionId } }
       )
         .then((Response) => {
           // console.log(Response.data.json);
-          switch (Response.data.json.code) {
+          switch (Response.data.code) {
             case 200:
-              ++that.thubms;
+              if(Response.data.data.status) {
+                that.web.thumbs++;
+                that.author.thumbsNumber++;
+              } else {
+                that.web.thumbs--;
+                that.author.thumbsNumber--;
+              }
               that.$message({
-                message: "点赞成功",
+                message: Response.data.data.msg,
                 type: "success",
               });
               break;
 
             default:
               that.$message({
-                message: "点赞..." + Response.data.json.exception,
+                message: Response.data.msg,
+                type: 'fail'
               });
               break;
           }
@@ -258,27 +276,35 @@ export default {
         return;
       }
       Axios.post(
-        "/blob/collection",
-        qs.stringify({
-          webid: this.webid,
+        "/blob/reversal",
+        {
+          webId: this.webid,
           bid: this.author.uid,
-        }),
+          type: 'collection'
+        },
         { headers: { Authorization: this.$store.getters.getsessionId } }
       )
         .then((Response) => {
           // console.log(Response.data.json);
-          switch (Response.data.json.code) {
+          switch (Response.data.code) {
             case 200:
-              ++that.collection;
+              if(Response.data.data.status) {
+                that.web.collection++;
+                that.author.collectionNumber++;
+              } else {
+                that.web.collection--;
+                that.author.collectionNumber--;
+              }
               that.$message({
-                message: "收藏成功",
+                message: Response.data.data.msg,
                 type: "success",
               });
               break;
 
             default:
               that.$message({
-                message: "收藏..." + Response.data.json.exception,
+                type: 'fail',
+                message: "收藏失败, " + Response.data.msg,
               });
               break;
           }
@@ -333,26 +359,23 @@ export default {
       })
         .then((Response) => {
           // console.log(Response.data.json);
-          if (Response.data.json.code == 200) {
-            that.web = { ...{}, ...Response.data.json.web };
+          if (Response.data.code == 200) {
+            that.web = { ...{}, ...Response.data.data };
 
-            that.visit = Response.data.json.visit;
-            that.thubms = Response.data.json.thubms;
-            that.collection = Response.data.json.collection;
-            that.commentList = [...[], ...Response.data.json.commentList];
-            that.commentList.reverse();
-            for (let index = 0; index < that.commentList.length; index++) {
-              that.commentList[index].imgpath =
-                "http://121.199.27.93/user/image/" + that.commentList[index].imgpath;
-            }
+            // that.commentList = [...[], ...Response.data.json.commentList];
+            // that.commentList.reverse();
+            // for (let index = 0; index < that.commentList.length; index++) {
+            //   that.commentList[index].imgpath =
+            //     "http://localhost/user/image/" + that.commentList[index].imgpath;
+            // }
             //document.title = "首页";
             // var titstr = that.web.title + " - CodeSharingCommunity";
             // document.title = titstr;
             //是否原创
-            if (that.web.contype == 1) {
-              that.contype = "原创";
+            if (that.web.type == 1) {
+              that.web.type = "原创";
             } else {
-              that.contype = "转载";
+              that.web.type = "转载";
             }
             if (Object.keys(that.$store.getters.getuser).length == 0) {
               document.getElementById("Statement").style.display = "none";
@@ -366,7 +389,7 @@ export default {
             //当登录人与文章作者一致时可修改
             if (that.$store.getters.getuser.uid == that.web.uid) {
               document.getElementById("change").style.display = "block";
-              document.getElementById("like").innerHTML = "me";
+              document.getElementById("like").innerHTML = "master";
               // that.href2 = "/PersonalCenter";
               // that.author.uid = "";
               // document.getElementsByClassName("thubm").style.color =
@@ -444,21 +467,22 @@ export default {
     //getauthor获取作者信息
     getauthor() {
       let that = this;
-      Axios.get("/blob/getauthor", {
+      Axios.get("/user/author", {
         params: {
           uid: this.web.uid,
         },
         headers: {
+          authorization: this.$store.getters.getsessionId,
           "X-Requested-With": "XMLHttpRequest",
         },
       })
         .then((Response) => {
           // console.log(Response.data.json);
-          if (Response.data.json.code == 200) {
-            that.author = { ...{}, ...Response.data.json.author };
-            that.webList = [...[], ...Response.data.json.webList];
+          if (Response.data.code == 200) {
+            that.author = { ...{}, ...Response.data.data };
+            that.webList = [...[], ...Response.data.data.lastBlob];
             that.author.imgpath =
-              "http://121.199.27.93/user/image/" + that.author.imgpath;
+              "http://localhost/user/image/" + that.author.imagePath;
             //占坑
             that.zhankeng = "*";
             var titstr =
@@ -480,11 +504,19 @@ export default {
             }
           } else {
             console.log(
-              Response.data.json.code +
+              Response.data.code +
                 "...作者信息" +
-                Response.data.json.exception
+                Response.data.msg
             );
           }
+
+          if(that.author.like) {
+            that.likeDisplay = "已关注";
+            document.getElementById("like").classList.remove("likeshow");
+            document.getElementById("like").style.color = "dimgray";
+            document.getElementById("like").classList.add("like_dimgray");
+          }
+
         })
         .catch((error) => {
           console.log(error);
@@ -515,6 +547,7 @@ export default {
     },
   },
   created() {
+
     this.blobWebid();
   },
   mounted() {
@@ -624,15 +657,15 @@ export default {
 }
 </style>>
   
-
-
 <style scoped>
 #blog_article {
-  display: flex;
   min-height: calc(100vh - 112px);
-  /* width: 100%; */
   padding: 0 10%;
-  background-color: rgb(59, 58, 58);
+  
+  display: flex;
+  background: url('../assets/cc80d4a7991b4167757a6213fce694f5b1c24c4b.png');
+  background-size:100% 100%;
+  background-color: rgb(43, 45, 48);
   overflow: hidden;
 }
 #left_content {
@@ -889,6 +922,11 @@ dd {
   font-weight: 600;
   cursor: pointer;
 }
+.like_dimgray {
+  color: dimgray;
+  font-weight: 600;
+  cursor: pointer;
+}
 #change {
   cursor: pointer;
   color: dodgerblue;
@@ -896,6 +934,7 @@ dd {
   line-height: 30px;
   font-size: 12px;
 }
+
 
 /* .thubm {
   cursor: pointer;
@@ -913,4 +952,5 @@ dd {
   width: 100%;
   border-radius: 10px 10px;
 }
+
 </style>

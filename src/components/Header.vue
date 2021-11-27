@@ -48,7 +48,7 @@ export default {
   padding: 10px;
   height: 30px;
   margin-top: 0;
-  margin: 0 auto 0 auto;
+  margin: 0 auto 10px auto;
 }
 ul {
   width: 640px;
