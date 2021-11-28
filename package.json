@@ -9,7 +9,7 @@
   "dependencies": {
     "axios": "^0.24.0",
     "core-js": "^3.6.4",
-    "element-ui": "^2.13.2",
+    "element-ui": "^2.15.6",
     "mavon-editor": "^2.8.3",
     "vue": "^2.6.11",
     "vue-cookie": "^1.1.4",

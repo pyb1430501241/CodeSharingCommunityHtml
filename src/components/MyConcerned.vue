@@ -5,17 +5,17 @@
         <div class="img">
           <img
             @click="resolve('/LoggingStatus/Author/' + citem.uid)"
-            :src="'http://121.199.27.93/user/image/' + citem.imgpath"
+            :src="'http://localhost/user/image/' + citem.user.imgPath"
             alt="img"
           />
           <b
-            @click="resolve('/LoggingStatus/Author/' + citem.uid)"
+            @click="resolve('/LoggingStatus/Author/' + citem.user.uid)"
             class="b1"
-            >{{ citem.username }}</b
+            >{{ citem.user.username }}</b
           >
           <span class="b2">{{ citem.college }}</span>
           <span class="b2">{{ citem.clazz }}</span>
-          <input @click="delike(citem.uid)" type="button" value="取消关注" />
+          <input @click="delike(citem.user.uid)" type="button" value="取消关注" />
         </div>
       </li>
     </ul>
@@ -38,21 +38,23 @@ export default {
      */
     getoneselficons() {
       let that = this;
-      Axios.get("/user/getoneselficons", {
-        params: {
+      Axios.post("/user/follow", 
+        {
           p: 1,
-        },
-        headers: { Authorization: this.$store.getters.getsessionId },
-      })
+        }, {
+          headers: { Authorization: this.$store.getters.getsessionId },
+        }
+      )
         .then((Response) => {
           // console.log(Response.data.json);
-          switch (Response.data.json.code) {
+          switch (Response.data.code) {
             case 200:
-              that.list = [...[], ...Response.data.json.userList.list];
+              that.list = [...[], ...Response.data.data.records];
               break;
-
+            case 404:
+              that.list = [];
             default:
-              console.log("getoneselffans" + Response.data.json.exception);
+              console.log("getoneselffans" + Response.data.msg);
               break;
           }
         })
@@ -72,18 +74,19 @@ export default {
         return;
       }
       Axios.post(
-        "/user/delike",
-        qs.stringify({
-          uid: likeid,
-        }),
+        "/blob/reversal",
+        {
+          likeId: likeid,
+          type: "like"
+        },
         { headers: { Authorization: this.$store.getters.getsessionId } }
       )
         .then((Response) => {
           // console.log(Response.data.json);
-          switch (Response.data.json.code) {
+          switch (Response.data.code) {
             case 200:
               that.$message({
-                message: "已取消关注",
+                message: Response.data.data.msg,
                 type: "success",
               });
               that.getoneselficons();

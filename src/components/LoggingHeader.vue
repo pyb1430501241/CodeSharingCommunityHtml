@@ -11,7 +11,18 @@
         </a>
       </li>
       <li>
+        <a href="/#/LoggingStatus/Content" target="_blank">
+          <b>博客</b>
+        </a>
+      </li>
+      <li>
+        <a href="/#/LoggingStatus/Content" target="_blank">
+          <b>资源</b>
+        </a>
+      </li>
+      <li>
         <input type="search" name="search" placeholder="搜索" />
+        <!-- <el-button class = "search_button" icon="el-icon-search">搜索</el-button> -->
       </li>
       <li>
         <img class="uimg" :src="imgsrc" />
@@ -33,7 +44,9 @@
           <li>
             <a href="/#/LoggingStatus/BlogEditor/0" target="_blank">创作</a>
           </li>
-
+          <li>
+            <a href="/#/LoggingStatus/BlogEditor/0" target="_blank">消息</a>
+          </li>
           <li>
             <a @click="exit()">退出</a>
           </li>
@@ -213,11 +226,13 @@ export default {
   margin: 0 auto 0 auto;
   z-index: 100;
 }
+
+
 ul {
-  width: 650px;
+  width: 100%;
   margin: 0 auto;
   height: 30px;
-  padding: 0;
+  padding: 0 20%;
 }
 li {
   display: inline;
@@ -255,6 +270,7 @@ img {
 .userid a {
   width: 100%;
 }
+
 a {
   /* width: 100%; */
   text-decoration: none;

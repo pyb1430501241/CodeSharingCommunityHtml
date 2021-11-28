@@ -2,7 +2,7 @@
   <div id="author">
     <div class="content">
       <img class="img" :src="author.imagePath" alt />
-      <h3>{{ author.username }}</h3>
+      <h4>{{ author.username }}</h4>
       <div class="data">
         <ul>
           <li>
@@ -50,19 +50,19 @@
             <!-- <span id="time">item.web.subTime</span> -->
           </div>
           <div class="wname">
-            <img :src="author.imgpath" alt="头像" />
+            <img :src="author.imagePath" alt="头像" />
             <!-- <a @click="changego(href+item.web.id)"> -->
-            <a :href="href + '/BlogArticle/' + item.web.id" target="_blank">
+            <a :href="href + '/BlogArticle/' + item.blob.id" target="_blank">
               <!-- <a href="href+item.web.id"> -->
-              <b>{{ item.web.type }}</b>
-              {{ item.web.title }}
+              <b>{{ item.blob.type }}</b>
+              {{ item.blob.title }}
             </a>
           </div>
           <div class="otherwise">
             <span>阅读:{{ item.visit }}</span>
-            <span class="biao">{{ item.web.subTime }}</span>
-            <!-- <span>收藏: item.collection</span> -->
-            <!-- <span>点赞:item.thumbs</span> -->
+            <span class="biao">{{ item.blob.createTime }}</span>
+            <span>收藏: {{item.collection}}</span>
+            <span>点赞:{{item.thumbs}}</span>
           </div>
         </li>
       </ol>
@@ -130,23 +130,24 @@ export default {
     //getblobs获取用户的博客
     getblobs() {
       let that = this;
-      Axios.get("/user/getblobs", {
-        params: {
+      Axios.post("/blob/getBlobs", 
+        {
           p: 1,
           uid: this.$route.params.uid,
-        },
-        headers: { Authorization: this.$store.getters.getsessionId },
-      }).then((Response) => {
+        }, {
+          headers: { Authorization: this.$store.getters.getsessionId },
+        }
+      ).then((Response) => {
         console.log(Response.data.json);
-        switch (Response.data.json.code) {
+        switch (Response.data.code) {
           case 200:
-            that.blobList = { ...{}, ...Response.data.json.blobList };
-            that.list = [...[], ...Response.data.json.blobList.list];
+            that.blobList = { ...{}, ...Response.data.data };
+            that.list = [...[], ...Response.data.data.records];
             for (const key in that.list) {
-              if (that.list[key].web.contype == 1) {
-                that.list[key].web.type = "原创";
+              if (that.list[key].blob.type == 1) {
+                that.list[key].blob.type = "原创";
               } else {
-                that.list[key].web.type = "转载";
+                that.list[key].blob.type = "转载";
               }
             }
             break;

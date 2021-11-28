@@ -4,7 +4,7 @@
       <li v-for="(item, index) in list" :key="index">
         <div class="img">
           <img
-            :src="'http://121.199.27.93/user/image/' + item.user.imgpath"
+            :src="'http://localhost/user/image/' + item.user.imgPath"
             alt="img"
           />
           <b class="b1">{{ item.user.username }}</b>
@@ -14,7 +14,7 @@
             @click="like(item.user.uid)"
             type="button"
             value="关注"
-            v-show="!item.islike"
+            v-show="!item.like"
           />
         </div>
       </li>
@@ -48,15 +48,15 @@ export default {
         }
       )
         .then((Response) => {
-          console.log(Response.data.json);
-          switch (Response.data.json.code) {
+          console.log(Response.data.data);
+          switch (Response.data.code) {
             case 200:
-              that.hasNextPage = Response.data.json.hasNextPage;
-              that.list = [...[], ...Response.data.json.fansList];
+              that.hasNextPage = Response.data.data.hasNext;
+              that.list = [...[], ...Response.data.data.records];
               break;
 
             default:
-              console.log("getoneselffans" + Response.data.json.exception);
+              console.log("getoneselffans" + Response.data.msg);
               break;
           }
         })
@@ -77,20 +77,22 @@ export default {
         return;
       }
       Axios.post(
-        "/user/like",
-        qs.stringify({
-          uid: likeid,
-        }),
+        "/blob/reversal",
+        {
+          likeId: likeid,
+          type: "like"
+        },
         { headers: { Authorization: this.$store.getters.getsessionId } }
       )
         .then((Response) => {
           // console.log(Response.data.json);
-          switch (Response.data.json.code) {
+          switch (Response.data.code) {
             case 200:
               that.$message({
-                message: "关注成功",
+                message: Response.data.data.msg,
                 type: "success",
               });
+              that.getoneselffans();
               break;
 
             default:
