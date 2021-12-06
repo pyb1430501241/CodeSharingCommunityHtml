@@ -26,7 +26,7 @@ const getCookie = (name) => {
         return arr[2];
     }
     
-    return null;
+    return '';
 }
 
 export default {

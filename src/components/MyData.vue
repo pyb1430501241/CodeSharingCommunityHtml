@@ -51,6 +51,13 @@
           value="修改信息"
         />
         <input
+          v-show="status"
+          @click="changePwd()"
+          type="button"
+          class="change_pwd"
+          value="修改密码"
+        />
+        <input
           v-show="!status"
           @click="changeinfor()"
           type="submit"
@@ -65,8 +72,8 @@
       <b>更换头像</b>
       <el-upload
         class="avatar-uploader"
-        action="/user/changeavatar"
-        name="img"
+        action="/image"
+        name="image"
         :headers="{ Authorization: this.$store.getters.getsessionId }"
         :show-file-list="false"
         accept="image/gif, image/jpeg, image/jpg, image/png, image/svg"
@@ -77,7 +84,7 @@
         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         <div slot="tip" class="el-upload__tip">
-          只能上传jpg/png等文件，且不超过2MB
+          只能上传jpg/png等文件, 且不超过10MB, 推荐使用圆形图案
         </div>
       </el-upload>
     </div>
@@ -131,15 +138,18 @@ export default {
         "image/gif" ||
         "image/svg" ||
         "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
+      const isLt2M = file.size / 1024 / 1024 < 10;
 
       if (!isJPG) {
         this.$message.error("上传头像图片只能是 JPG 格式!");
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
+        this.$message.error("上传头像图片大小不能超过 10 MB!");
       }
       return isJPG && isLt2M;
+    },
+    changePwd() {
+      this.$router.push({ path: "/LoggingStatus/ChangePassword" });
     },
 
     /**
@@ -149,28 +159,31 @@ export default {
     changeinfor() {
       let that = this;
       Axios.post(
-        "/user/changeinfor",
-        qs.stringify({
+        "/update",
+        {
           uid: this.user.uid,
           username: this.user.username,
-          college: this.user.college,
-          clazz: this.user.clazz,
-        }),
+        },
         {
           headers: { Authorization: this.$store.getters.getsessionId },
         }
       )
         .then((Response) => {
-          console.log(Response.data.json);
-          switch (Response.data.json.code) {
+          switch (Response.data.code) {
             case 200:
-              that.user = { ...that.user, ...Response.data.json.user };
+              that.user = { ...that.user, ...Response.data.data };
               that.status = true;
-              alert("修改..." + Response.data.json.msg);
+              this.$message({
+                message: "更新成功",
+                type: "success",
+              });
               break;
 
             default:
-              alert("修改..." + Response.data.json.exception);
+              this.$message({
+                message: "网络异常",
+                type: "error",
+              });
               break;
           }
         })
@@ -284,6 +297,9 @@ export default {
 #my_data {
   height: auto;
   width: auto;
+}
+.change_pwd {
+  margin: auto auto auto 10px;
 }
 dl {
   display: block;

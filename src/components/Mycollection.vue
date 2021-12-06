@@ -2,8 +2,8 @@
   <div class="my_article">
     <ul>
       <li v-for="(aitem, aindex) in list" :key="aindex">
-        <h5 @click="resolve(aitem.web.id)">{{ aitem.web.title }}</h5>
-        <a @click="decollection(aitem.web.id)" class="del">取消收藏</a>
+        <h5 @click="resolve(aitem.blob.id)">{{ aitem.blob.title }}</h5>
+        <a @click="decollection(aitem.blob.id)" class="del">取消收藏</a>
         <!-- <a @click="updatablob(aitem.web.id)" class="upd">编辑</a> -->
         <div class="otherwise">
           <span @click="author(aitem.user.uid)"
@@ -11,8 +11,9 @@
           >
           <!-- <span class="biao">{{ aitem.web.type }}</span> -->
           <span>阅读:{{ aitem.visit }}</span>
-          <span>{{ aitem.web.subTime }}</span>
-          <!-- <span>点赞:{{ item.thubms }}</span> -->
+          <span>点赞:{{ aitem.thubms }}</span>
+          <span>收藏:{{ aitem.collection }}</span>
+          <span>{{ aitem.blob.createTime }}</span>
         </div>
       </li>
     </ul>
@@ -22,6 +23,7 @@
 import Axios from "axios";
 import store from "../store";
 import qs from "qs";
+import cookie from '../store/cookie';
 export default {
   data() {
     return {
@@ -49,28 +51,28 @@ export default {
     decollection(webid) {
       let that = this;
       Axios.post(
-        "/blob/decollection",
-        qs.stringify({
-          webid: webid,
-        }),
-        { headers: { Authorization: this.$store.getters.getsessionId } }
+        "/blob/reversal",
+        {
+          webId: webid,
+          type: "collection"
+        },
+        { 
+          headers: { Authorization: cookie.getCookie('authorization') } 
+        }
       ).then((Response) => {
-        console.log(Response.data.json);
-        switch (Response.data.json.code) {
+        switch (Response.data.code) {
           case 200:
             that.$message({
-              message: "已取消收藏",
+              message: Response.data.data.msg,
+              type: "success",
             });
             that.getcollection();
             break;
 
           default:
             that.$message({
-              message:
-                "取消收藏..." +
-                Response.data.json.code +
-                "..." +
-                Response.data.json.exception,
+              type: 'fail',
+              message: "收藏失败, " + Response.data.msg,
             });
             break;
         }
@@ -92,21 +94,20 @@ export default {
      */
     getcollection() {
       let that = this;
-      Axios.get("/blob/getcollection", {
-        params: {
-          uid: this.$store.getters.getuser.uid,
-        },
-        headers: { Authorization: this.$store.getters.getsessionId },
+      Axios.post("/blob/collections", {
+        
+      }, {
+        headers: { Authorization: cookie.getCookie('authorization') },
       })
         .then((Response) => {
-          console.log(Response.data.json.blobList);
-          switch (Response.data.json.code) {
+          console.log(Response.data.data);
+          switch (Response.data.code) {
             case 200:
               {
-                that.hasNextPage = Response.data.json.hasNextPage;
-                that.list = [...[], ...Response.data.json.blobList];
+                that.hasNextPage = Response.data.data.hasNext;
+                that.list = [...[], ...Response.data.data.records];
                 for (const key in that.list) {
-                  if (that.list[key].web.contype == "1") {
+                  if (that.list[key].web.type == "1") {
                     that.list[key].web.type = "原创";
                   } else {
                     that.list[key].web.type = "转载";
@@ -116,7 +117,7 @@ export default {
               break;
 
             default:
-              console.log("我的博客..." + Response.data.json.exception);
+              console.log("我的博客..." + Response.data.msg);
               break;
           }
         })

@@ -32,13 +32,39 @@ const post = (url, data, success, fail) => {
 
 }
 
+const currentUser = () => {
+  var currentUser = sessionStorage.getItem('user');
+
+  if(currentUser != null) {
+    return JSON.parse(currentUser);
+  }
+
+  if(loginStatus()) {
+    currentUser = sessionStorage.getItem('user');
+    return JSON.parse(currentUser);
+  }
+
+  return {username: 'username'};
+}
+
+const loginCheck = () => {
+
+  if(cookie.getCookie('authorization') == null) {
+    return false;
+  }
+
+  return loginStatus();
+}
+
+
 const loginStatus = () => {
     var currentUser = sessionStorage.getItem('user');
+
     if(currentUser != null) {
       return true;
     }
-    let val = false;
-    axios
+
+     axios
       .get("/nav", {
         params: {},
         headers: {
@@ -48,18 +74,19 @@ const loginStatus = () => {
       .then((Response) => {
         if (Response.data.code === 200) {
           //将登陆状态放入store
-          val = true;
           sessionStorage.setItem('user', JSON.stringify(Response.data.data));
-        } else {
-          val = false;
+
+          return true;
         }
+
+        return false;
       })
       .catch((error) => {
         console.log(error);
+        return false;
       });
-    return val;
 }
 
 export default {
-    get, post, loginStatus
+    get, post, loginStatus, loginCheck, currentUser
 }

@@ -1,7 +1,7 @@
 <template>
   <div id="rogin">
     <div id="mycontent">
-      <h1 style="font-size: 3em">PDSU·S607·CSC</h1>
+      <h1 style="font-size: 3em">2018级-庞亚彬-毕业设计</h1>
       <h1>CodeSharingCommunity</h1>
     </div>
     <div id="InList">
@@ -239,7 +239,7 @@ export default {
   /* overflow: scroll; */
   min-height: calc(100vh - 112px);
   /* background-color: saddlebrown; */
-  background-image: url("../assets/img-dc.jpg");
+  background-image: url("../assets/0072Vf1pgy1foxlna4bcfj31kw0w0h96.png");
   background-size: cover;
   backface-visibility: visible;
   background-repeat: no-repeat;

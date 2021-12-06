@@ -290,7 +290,7 @@ h1 {
   height: auto;
   background-color: #222;
   display: none;
-  z-index: 100;
+  z-index: 1000;
 }
 .down li {
   width: 80px;

@@ -174,7 +174,7 @@ export default {
       )
         .then((Response) => {
           if (Response.data.code == 200) {
-            that.hasNextPage = Response.data.data.hasNextPage;
+            that.hasNextPage = Response.data.data.hasNext;
             that.list = [...[], ...Response.data.data.records];
             console.log(that.list)
             that.pageNum = that.pageNum + 1;
@@ -245,11 +245,11 @@ export default {
         .then((Response) => {
           if (Response.data.code == 200) {
             let list = [...[], ...Response.data.data.records];
-            that.hasNextPage = Response.data.data.hasNextPage;
+            that.hasNextPage = Response.data.data.hasNext;
             that.pageNum = that.pageNum + 1;
 
             for (const iter of list) {
-              if (iter.blob.contype == 1) {
+              if (iter.blob.type == 1) {
                 iter.blob.type = "原创";
               } else {
                 iter.blob.type = "转载";
@@ -290,8 +290,8 @@ export default {
 
 <style scoped>
 #content {
-  background: url('../assets/0072Vf1pgy1foxkgbgscjj31hc0u0k39.png');
-  background-size:100% 80%;
+  background-image: url('../assets/cc80d4a7991b4167757a6213fce694f5b1c24c4b.png');
+  background-size:100% 100%;
   overflow: hidden;
   display: flex;
   /* overflow: scroll; */
@@ -301,16 +301,16 @@ export default {
 #wenzhang_type {
   position: relative;
   width: 20%;
-  background-color: #eeeeee;
+  /* background-color: #eeeeee; */
   margin: 0;
   padding: 0;
   display: flex;
-  box-shadow: 0 10px 10px 0 #333333;
+  /* box-shadow: 0 10px 10px 0 #333333; */
 }
 #tuijian_wenzhang {
   position: relative;
   width: 60%;
-  background-color: #eeeeee;
+  /* background-color: #eeeeee; */
   /* background-color: white; */
   margin: 0;
   padding: 0;
@@ -318,10 +318,10 @@ export default {
 #tuijian_yonghu {
   display: flex;
   width: 20%;
-  background-color: #eeeeee;
+  /* background-color: #eeeeee; */
   margin: 0;
   padding: 0;
-  box-shadow: 0 10px 10px 0 #333333;
+  /* box-shadow: 0 10px 10px 0 #333333; */
 }
 
 ul li {

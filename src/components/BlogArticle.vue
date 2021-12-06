@@ -81,12 +81,12 @@
         <div id="otherwise">
           <span class="biao">{{ web.type }}</span>
           <div class="tcv">
-            <img @click="thumbs" src="../assets/good.svg" alt>
+            <img @click="thumbs" :src="goodSrc" alt>
             <span id="thubm">点赞:{{ web.thumbs }}</span>
           </div>
           <span class="visi">阅读:{{ web.visit }}</span>
           <div class="tcv">
-            <img @click="blobcollection" src="../assets/favorites.svg" alt />
+            <img @click="blobcollection" :src="collectionSrc" alt />
             <span id="col">收藏:{{ web.collection }}</span>
           </div>
           <b
@@ -136,11 +136,14 @@
 </template>
 <script>
 import Axios from "axios";
+import cookie from '../store/cookie';
 import store from "../store";
 import qs from "qs";
 export default {
   data() {
     return {
+      goodSrc: require('../assets/good.svg'),
+      collectionSrc: require('../assets/favorites.svg'),
       web: {},
       webList: [],
       author: {
@@ -239,9 +242,11 @@ export default {
           switch (Response.data.code) {
             case 200:
               if(Response.data.data.status) {
+                that.goodSrc = require('../assets/good-fill.svg');
                 that.web.thumbs++;
                 that.author.thumbsNumber++;
               } else {
+                that.goodSrc = require('../assets/good.svg');
                 that.web.thumbs--;
                 that.author.thumbsNumber--;
               }
@@ -289,9 +294,11 @@ export default {
           switch (Response.data.code) {
             case 200:
               if(Response.data.data.status) {
+                that.collectionSrc = require('../assets/favorites-fill.svg');
                 that.web.collection++;
                 that.author.collectionNumber++;
               } else {
+                that.collectionSrc = require('../assets/favorites.svg');
                 that.web.collection--;
                 that.author.collectionNumber--;
               }
@@ -354,7 +361,7 @@ export default {
       Axios.get("/blob/" + this.$route.params.webid, {
         params: {},
         headers: {
-          Authorization: this.$store.getters.getsessionId,
+          Authorization: cookie.getCookie('authorization'),
         },
       })
         .then((Response) => {
@@ -362,15 +369,14 @@ export default {
           if (Response.data.code == 200) {
             that.web = { ...{}, ...Response.data.data };
 
-            // that.commentList = [...[], ...Response.data.json.commentList];
-            // that.commentList.reverse();
-            // for (let index = 0; index < that.commentList.length; index++) {
-            //   that.commentList[index].imgpath =
-            //     "http://localhost/user/image/" + that.commentList[index].imgpath;
-            // }
-            //document.title = "首页";
-            // var titstr = that.web.title + " - CodeSharingCommunity";
-            // document.title = titstr;
+            if(that.web.thumbsStatus) {
+                that.goodSrc = require('../assets/good-fill.svg');
+            }
+
+            if(that.web.collectionStatus) {
+                that.collectionSrc = require('../assets/favorites-fill.svg');
+            }
+
             //是否原创
             if (that.web.type == 1) {
               that.web.type = "原创";
@@ -674,6 +680,7 @@ export default {
   border-right: rgb(59, 58, 58) 5px solid;
   width: 20%;
   min-width: 200px;
+  margin: 8px auto 0 auto;
 }
 #the_author {
   background-color: white;
@@ -800,6 +807,7 @@ dd {
   color: #5893c2;
 }
 .article {
+  margin: 8px auto 0 auto;
   min-height: calc(100vh - 112px);
   /* min-height: 100vh; */
   width: 80%;
@@ -817,6 +825,7 @@ dd {
   padding: 0 10%;
   min-height: calc(100vh - 200px);
   border-radius: 10px 10px;
+  z-index: 1;
 }
 .comment {
   overflow: hidden;

@@ -61,6 +61,8 @@
 </template>
 <script>
 import Axios from "axios";
+import cookie from '../store/cookie'
+import request from '../store/request'
 import store from "../store";
 import qs from "qs";
 export default {
@@ -101,15 +103,15 @@ export default {
       // 第一步.将图片上传到服务器.
       console.log($file);
       var formdata = new FormData();
-      formdata.append("img", $file);
+      formdata.append("file", $file);
 
       Axios({
-        url: "/blob/blobimg",
+        url: "/blob/upload",
         method: "post",
         data: formdata,
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: this.$store.getters.getsessionId,
+          Authorization: cookie.getCookie('authorization'),
         },
       })
         .then((url) => {
@@ -119,10 +121,11 @@ export default {
            * 1. 通过引入对象获取: `import {mavonEditor} from ...` 等方式引入后，`$vm`为`mavonEditor`
            * 2. 通过$refs获取: html声明ref : `<mavon-editor ref=md ></mavon-editor>，`$vm`为 `this.$refs.md`
            */
-          // console.log(url.data.json);
+          console.log(url.data.data);
+
           that.$refs.md.$img2Url(
             pos,
-            "http://121.199.27.93/blob/image/" + url.data.json.img
+            "http://localhost/blob/image/" + url.data.data
           );
         })
         .catch((error) => {
@@ -143,7 +146,7 @@ export default {
       var that = this;
       Axios.get("/blob/types", {
         headers: {
-          authorization : this.$store.getters.getsessionId,
+          authorization : cookie.getCookie('authorization'),
           "X-Requested-With": "XMLHttpRequest",
         },
       }).then((response) => {
@@ -156,6 +159,7 @@ export default {
       var that = this;
       Axios.get("/blob/labels", {
         headers: {
+          authorization : cookie.getCookie('authorization'),
           "X-Requested-With": "XMLHttpRequest",
         },
       }).then((response) => {
@@ -170,7 +174,7 @@ export default {
     contribution() {
       let that = this;
       // console.log(this.title + "///" + this.webDataString);
-      let sessionid = this.$store.getters.getsessionId;
+      let sessionid = cookie.getCookie('authorization');
       // console.log("id=" + sessionid);
       this.contype = document.getElementById("select").value;
 
@@ -216,7 +220,6 @@ export default {
     update() {
       let that = this;
       // console.log(this.title + "///" + this.webDataString);
-      let sessionid = this.$store.getters.getsessionId;
       // console.log("id=" + sessionid);
       this.contype = document.getElementById("select").value;
       console.log(this.contype);
@@ -229,7 +232,7 @@ export default {
           labelList: that.checkedLabels,
           webDataString: that.checkedLabels.toString(),
         }),
-        { headers: { Authorization: this.$store.getters.getsessionId } }
+        { headers: { Authorization: cookie.getCookie('authorization') } }
       )
         .then((Response) => {
           // console.log(Response.data.json);
@@ -267,7 +270,7 @@ export default {
       Axios.get("/blob/" + this.webid, {
         params: {},
         headers: {
-          Authorization: this.$store.getters.getsessionId,
+          Authorization: cookie.getCookie('authorization'),
         },
       })
         .then((Response) => {

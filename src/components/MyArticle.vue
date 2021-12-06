@@ -101,7 +101,7 @@ export default {
      */
     getoneselfblobs() {
       let that = this;
-      Axios.post("/blob/getBlobs", 
+      Axios.post("/blob/blobs", 
         {
           p: 1,
         }, {

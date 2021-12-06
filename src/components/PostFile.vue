@@ -34,13 +34,14 @@
       :on-change="handleChange"
       :file-list="fileList"
       :auto-upload="false"
+      accept=".rar,.zip,.7z,.tar,.gz"
       :limit="1"
       :multiple="false"
     >
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或<em>点击选择</em></div>
       <div class="el-upload__tip" slot="tip">
-        只能上传jpg/png文件，且不超过500kb
+        支持文件格式: .rar .7z .zip .tar .gz，且不超过100MB
       </div>
     </el-upload>
   </div>
@@ -87,9 +88,10 @@ export default {
         },
       })
         .then((res) => {
-          if (res.data.json.code === 200) {
+          if (res.data.code === 200) {
+            console.log(res.data);
             this.$message({
-              message: "上传资源成功，fileid=" + res.data.json.fileid,
+              message: "上传资源成功，fileid=" + res.data.data,
               type: "success",
             });
           } else {
@@ -101,6 +103,9 @@ export default {
         });
     },
   },
+  mounted() {
+  document.title = "上传资源 - 代码共享社区 - CodeSharingCommunity";
+},
 };
 </script>
 

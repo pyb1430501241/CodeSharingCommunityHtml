@@ -62,6 +62,7 @@ export default new Router({
                 { path: "PostFile", component: PostFile, name: 'PostFile' },
                 { path: "BlogArticle/:webid", component: BlogArticle, name: 'lBlogArticle' },
                 { path: "Author/:uid", component: Author, name: 'lAuthor' },
+                { path: 'ChangePassword', component: ChangePassword, name: 'ChangePassword' },
             ]
         }
     ]

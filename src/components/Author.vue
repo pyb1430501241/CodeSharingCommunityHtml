@@ -130,7 +130,7 @@ export default {
     //getblobs获取用户的博客
     getblobs() {
       let that = this;
-      Axios.post("/blob/getBlobs", 
+      Axios.post("/blob/blobs", 
         {
           p: 1,
           uid: this.$route.params.uid,

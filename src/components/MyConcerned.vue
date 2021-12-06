@@ -38,7 +38,7 @@ export default {
      */
     getoneselficons() {
       let that = this;
-      Axios.post("/user/follow", 
+      Axios.post("/user/follows", 
         {
           p: 1,
         }, {
