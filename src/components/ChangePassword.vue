@@ -3,8 +3,9 @@
     <div id="change">
       <div>
         <h3>
-          <span v-bind:class="{showspan:condition3}">①确认账号 »» »»&nbsp;</span>
-          <span v-bind:class="{showspan:condition2}">»» »» ②找回密码</span>
+          <span v-bind:class="{showspan:condition3}">确认账号 ------</span>
+          <span> | </span>
+          <span v-bind:class="{showspan:condition2}">------ 找回密码</span>
         </h3>
         <div id="confirm" v-show="condition1">
           <b>确认账号:</b>
@@ -37,6 +38,7 @@
 <script>
 import Axios from "axios";
 import qs from "qs";
+import cookie from '../store/cookie';
 export default {
   data() {
     return {
@@ -44,6 +46,7 @@ export default {
         uid: "",
         email: "",
         token: "",
+        username: "",
         emailCode: "",
         newpassword: "",
         renewpassword: "",
@@ -57,7 +60,7 @@ export default {
     //验证确认用户名
     isexist() {
       let that = this;
-      Axios.get("/user/isexist", {
+      Axios.get("/user/exist", {
         params: {
           uid: this.newobj.uid,
         },
@@ -67,33 +70,26 @@ export default {
       })
         .then((Response) => {
           // console.log(Response.data.json);
-          if (Response.data.json.code == 200) {
+          if (Response.data.code == 200) {
             //newobj中的email,uid,token接受，condition1，condition2更改状态
-            that.newobj.email = Response.data.json.email.email;
-            that.newobj.uid = Response.data.json.uid;
-            that.newobj.token = Response.data.json.token;
+            that.newobj.email = Response.data.data.email;
+            that.newobj.token = Response.data.data.token;
+            that.newobj.username = Response.data.data.username;         
+            that.newobj.uid = Response.data.data.uid;   
             that.condition1 = false;
             that.condition2 = true;
+            that.condition3 = false;
             that.$message({
               showClose: true,
               message:
-                Response.data.json.uid +
-                "......" +
-                Response.data.json.email.email,
+                "验证成功",
               type: "success",
             });
           } else {
-            console.log(
-              Response.data.json.code +
-                "...用户名验证" +
-                Response.data.json.exception
-            );
             that.$message({
               showClose: true,
               message:
-                Response.data.json.code +
-                "...用户名验证" +
-                Response.data.json.exception,
+                Response.data.msg,
               type: "error",
             });
           }
@@ -107,19 +103,19 @@ export default {
      */
     getcodeforretrieve() {
       let that = this;
-      console.log("that.newobj.email = " + that.newobj.email);
-      Axios.get("/user/getcodeforretrieve", {
-        params: {
+      Axios.post("/changePasswordCode", {
           token: that.newobj.token,
-        },
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-        },
-      })
+          username: that.newobj.username
+        }, {
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        }
+      )
         .then((Response) => {
           // console.log(Response.data.json);
-          if (Response.data.json.code == 200) {
-            that.newobj.token = Response.data.json.token;
+          if (Response.data.code == 200) {
+            that.newobj.token = Response.data.data;
             that.$message({
               showClose: true,
               message: "邮箱验证码已发送",
@@ -127,17 +123,10 @@ export default {
             });
             // console.log("that.newobj.token = " + that.newobj.token);
           } else {
-            console.log(
-              Response.data.json.code +
-                "...邮箱验证" +
-                Response.data.json.exception
-            );
             that.$message({
               showClose: true,
               message:
-                Response.data.json.code +
-                "...邮箱验证..." +
-                Response.data.json.exception,
+                Response.data.msg,
               type: "error",
             });
           }
@@ -146,6 +135,7 @@ export default {
           console.log(error);
         });
     },
+
     /**
      * 找回密码，retrieve
      */
@@ -156,41 +146,73 @@ export default {
         return;
       }
       Axios.post(
-        "/user/retrieve",
-        qs.stringify({
+        "/retrieve",
+        {
           uid: that.newobj.uid,
           token: that.newobj.token,
           code: that.newobj.emailCode,
           password: that.newobj.newpassword,
-        })
+        }
       )
         .then((Response) => {
           // console.log(Response.data.json);
-          if (Response.data.json.code == 200) {
+          if (Response.data.code == 200) {
             that.$message({
               showClose: true,
-              message: "找回密码" + Response.data.json.msg + "返回登录",
+              message: "修改成功, 请重新登录",
               type: "success",
             });
-            this.$router.push({ path: "/HelloWorld/Rogon" });
+
+            if(cookie.getCookie("authorization") != '') {
+                this.exit();
+            } else {
+              this.$router.push({ path: "/HelloWorld/Rogon" });
+            }
+
           } else {
-            console.log(
-              Response.data.json.code +
-                "...找回密码" +
-                Response.data.json.exception
-            );
             that.$message({
               showClose: true,
               message:
-                Response.data.json.code +
-                "...找回密码..." +
-                Response.data.json.exception,
+                Response.data.msg,
               type: "error",
             });
           }
         })
         .catch((error) => {
           console.log(error);
+        });
+    },
+    exit() {
+      // this.$router.push({ path: "/HelloWorld/Rogon" });
+      var that = this;
+      var accessToken = cookie.getCookie("authorization");
+      if (accessToken == "") {
+        that.$store.commit("setuser", "");
+        that.$store.commit("setsessionId", "");
+        // console.log("accessToken=null" + accessToken);
+        that.$router.push({ path: "/HelloWorld/Rogon" });
+        return;
+      }
+      // console.log("accessToken=" + accessToken);
+      Axios
+        .post("/logout", {
+          
+        },{
+          headers: {
+            authorization: accessToken,
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        })
+        .then((Response) => {
+          that.$store.commit("setuser", "");
+          that.$store.commit("setsessionId", "");
+          cookie.delCookie('authorization');
+          that.$router.push({ path: "/HelloWorld/Rogon" });
+        })
+        .catch((error) => {
+          console.log(error);
+          alert(error);
+          // that.$router.push({ path: "/HelloWorld/Rogon" });
         });
     },
     /**
@@ -219,6 +241,7 @@ export default {
 h3 {
   font-size: 14px;
   line-height: 30px;
+  text-align:center;
 }
 .showspan {
   color: dodgerblue;

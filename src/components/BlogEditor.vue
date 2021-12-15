@@ -9,7 +9,7 @@
           id="blogtitle"
           placeholder="标题"
         />
-        <select name="select" id="select" :value="contype">
+        <select name="select" id="select">
           <!-- <option value="1">原创</option>
           <option value="2">转载</option> -->
           <option
@@ -150,7 +150,6 @@ export default {
           "X-Requested-With": "XMLHttpRequest",
         },
       }).then((response) => {
-        console.log(response.data.data);
         that.contypeList = [...[], ...response.data.data];
       });
     },
@@ -225,34 +224,32 @@ export default {
       console.log(this.contype);
       Axios.post(
         "/blob/update",
-        qs.stringify({
+        {
           id: that.webid,
           title: that.title,
-          contype: that.contype,
-          labelList: that.checkedLabels,
-          webDataString: that.checkedLabels.toString(),
-        }),
+          type: that.contype,
+          data: that.webDataString,
+          labelIds: that.checkedLabels,
+        },
         { headers: { Authorization: cookie.getCookie('authorization') } }
       )
         .then((Response) => {
           // console.log(Response.data.json);
-          if (Response.data.json.code == 200) {
+          if (Response.data.code == 200) {
             that.$message({
               showClose: true,
               message:
-                "修改..." + Response.data.json.msg + Response.data.json.webid,
+                "发布成功",
               type: "success",
             });
             this.$router.push({
-              path: `/LoggingStatus/BlogArticle/${that.webid}`,
+              path: `/LoggingStatus/BlogArticle/${Response.data.data}`,
             });
           } else {
             that.$message({
               showClose: true,
               message:
-                Response.data.json.code +
-                "...修改..." +
-                Response.data.json.exception,
+                Response.data.msg,
               type: "error",
             });
           }

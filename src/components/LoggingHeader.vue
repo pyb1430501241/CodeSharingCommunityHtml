@@ -101,9 +101,6 @@ export default {
           },
         })
         .then((Response) => {
-          // console.log("登出：" + Response.data.msg);
-          console.log(Response);
-
           that.$store.commit("setuser", "");
           that.$store.commit("setsessionId", "");
           that.$router.push({ path: "/HelloWorld/Rogon" });

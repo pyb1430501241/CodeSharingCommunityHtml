@@ -2,7 +2,7 @@
   <div id="blog_article">
     <div id="left_content">
       <div id="the_author">
-        <div class="head_name" >
+        <div class="head_name">
           <div class="head_portrait">
             <a id="himg" :href="href + href2 + author.uid">
               <img class="himg" :src="author.imgpath" alt />
@@ -78,10 +78,11 @@
     <div class="article">
       <div id="article_title">
         <h1>{{ web.title }}</h1>
+
         <div id="otherwise">
           <span class="biao">{{ web.type }}</span>
           <div class="tcv">
-            <img @click="thumbs" :src="goodSrc" alt>
+            <img @click="thumbs" :src="goodSrc" alt />
             <span id="thubm">点赞:{{ web.thumbs }}</span>
           </div>
           <span class="visi">阅读:{{ web.visit }}</span>
@@ -96,6 +97,13 @@
             id="change"
             >编辑</b
           >
+          <div class="article_labels">
+            <span class="visi">标签:</span>
+            <li class="visi" v-show="labelEmpty">无</li>
+            <li class="visi" v-for="(item, index) in web.labels" :key="index">
+              {{ item.label }}
+            </li>
+          </div>
         </div>
       </div>
       <mavon-editor
@@ -136,14 +144,15 @@
 </template>
 <script>
 import Axios from "axios";
-import cookie from '../store/cookie';
+import cookie from "../store/cookie";
 import store from "../store";
 import qs from "qs";
 export default {
   data() {
     return {
-      goodSrc: require('../assets/good.svg'),
-      collectionSrc: require('../assets/favorites.svg'),
+      labelEmpty: false,
+      goodSrc: require("../assets/good.svg"),
+      collectionSrc: require("../assets/favorites.svg"),
       web: {},
       webList: [],
       author: {
@@ -158,7 +167,7 @@ export default {
       href: "/#/HelloWorld",
       href2: "/Author/",
       imgsrc: require("../assets/prompt.svg"),
-      likeDisplay: "关注"
+      likeDisplay: "关注",
     };
   },
   methods: {
@@ -174,10 +183,10 @@ export default {
         return;
       }
       Axios.post(
-        "/blob/reversal", 
+        "/blob/reversal",
         {
           likeId: this.author.uid,
-          type: 'like'
+          type: "like",
         },
         { headers: { Authorization: this.$store.getters.getsessionId } }
       )
@@ -185,7 +194,7 @@ export default {
           // console.log(Response.data.json);
           switch (Response.data.code) {
             case 200:
-              if(Response.data.data.status) {
+              if (Response.data.data.status) {
                 document.getElementById("like").style.color = "dimgray";
                 document.getElementById("like").classList.remove("likeshow");
                 document.getElementById("like").classList.add("like_dimgray");
@@ -193,7 +202,9 @@ export default {
                 that.author.fansNumber++;
               } else {
                 document.getElementById("like").style.color = "dodgerblue";
-                document.getElementById("like").classList.remove("like_dimgray");
+                document
+                  .getElementById("like")
+                  .classList.remove("like_dimgray");
                 document.getElementById("like").classList.add("likeshow");
                 that.likeDisplay = "关注";
                 that.author.fansNumber--;
@@ -233,7 +244,7 @@ export default {
         {
           webId: this.webid,
           bid: this.author.uid,
-          type: 'thumbs'
+          type: "thumbs",
         },
         { headers: { Authorization: this.$store.getters.getsessionId } }
       )
@@ -241,12 +252,12 @@ export default {
           // console.log(Response.data.json);
           switch (Response.data.code) {
             case 200:
-              if(Response.data.data.status) {
-                that.goodSrc = require('../assets/good-fill.svg');
+              if (Response.data.data.status) {
+                that.goodSrc = require("../assets/good-fill.svg");
                 that.web.thumbs++;
                 that.author.thumbsNumber++;
               } else {
-                that.goodSrc = require('../assets/good.svg');
+                that.goodSrc = require("../assets/good.svg");
                 that.web.thumbs--;
                 that.author.thumbsNumber--;
               }
@@ -259,7 +270,7 @@ export default {
             default:
               that.$message({
                 message: Response.data.msg,
-                type: 'fail'
+                type: "fail",
               });
               break;
           }
@@ -285,7 +296,7 @@ export default {
         {
           webId: this.webid,
           bid: this.author.uid,
-          type: 'collection'
+          type: "collection",
         },
         { headers: { Authorization: this.$store.getters.getsessionId } }
       )
@@ -293,12 +304,12 @@ export default {
           // console.log(Response.data.json);
           switch (Response.data.code) {
             case 200:
-              if(Response.data.data.status) {
-                that.collectionSrc = require('../assets/favorites-fill.svg');
+              if (Response.data.data.status) {
+                that.collectionSrc = require("../assets/favorites-fill.svg");
                 that.web.collection++;
                 that.author.collectionNumber++;
               } else {
-                that.collectionSrc = require('../assets/favorites.svg');
+                that.collectionSrc = require("../assets/favorites.svg");
                 that.web.collection--;
                 that.author.collectionNumber--;
               }
@@ -310,7 +321,7 @@ export default {
 
             default:
               that.$message({
-                type: 'fail',
+                type: "fail",
                 message: "收藏失败, " + Response.data.msg,
               });
               break;
@@ -361,7 +372,7 @@ export default {
       Axios.get("/blob/" + this.$route.params.webid, {
         params: {},
         headers: {
-          Authorization: cookie.getCookie('authorization'),
+          Authorization: cookie.getCookie("authorization"),
         },
       })
         .then((Response) => {
@@ -369,12 +380,18 @@ export default {
           if (Response.data.code == 200) {
             that.web = { ...{}, ...Response.data.data };
 
-            if(that.web.thumbsStatus) {
-                that.goodSrc = require('../assets/good-fill.svg');
+            if (that.web.thumbsStatus) {
+              that.goodSrc = require("../assets/good-fill.svg");
             }
 
-            if(that.web.collectionStatus) {
-                that.collectionSrc = require('../assets/favorites-fill.svg');
+            if (that.web.collectionStatus) {
+              that.collectionSrc = require("../assets/favorites-fill.svg");
+            }
+
+            if(that.web.labels.length == 0) {
+                this.labelEmpty = true;
+            } else {
+              this.labelEmpty = false;
             }
 
             //是否原创
@@ -393,7 +410,7 @@ export default {
               document.getElementById("enter").style.display = "inline-block";
             }
             //当登录人与文章作者一致时可修改
-            if (that.$store.getters.getuser.uid == that.web.uid) {
+            if (that.web.editable) {
               document.getElementById("change").style.display = "block";
               document.getElementById("like").innerHTML = "master";
               // that.href2 = "/PersonalCenter";
@@ -444,7 +461,8 @@ export default {
             that.commentList.push({
               content: that.Statement,
               username: Response.data.json.username,
-              imgpath: "http://121.199.27.93/user/image/" + Response.data.json.imgpath,
+              imgpath:
+                "http://121.199.27.93/user/image/" + Response.data.json.imgpath,
               createtime: Response.data.json.createtime,
             });
             that.commentList.reverse();
@@ -509,20 +527,15 @@ export default {
               document.getElementById("like").classList.add("likeshow");
             }
           } else {
-            console.log(
-              Response.data.code +
-                "...作者信息" +
-                Response.data.msg
-            );
+            console.log(Response.data.code + "...作者信息" + Response.data.msg);
           }
 
-          if(that.author.like) {
+          if (that.author.like) {
             that.likeDisplay = "已关注";
             document.getElementById("like").classList.remove("likeshow");
             document.getElementById("like").style.color = "dimgray";
             document.getElementById("like").classList.add("like_dimgray");
           }
-
         })
         .catch((error) => {
           console.log(error);
@@ -553,7 +566,6 @@ export default {
     },
   },
   created() {
-
     this.blobWebid();
   },
   mounted() {
@@ -667,10 +679,12 @@ export default {
 #blog_article {
   min-height: calc(100vh - 112px);
   padding: 0 10%;
-  
+
   display: flex;
-  background: url('../assets/cc80d4a7991b4167757a6213fce694f5b1c24c4b.png');
-  background-size:100% 100%;
+  background: url("../assets/cc80d4a7991b4167757a6213fce694f5b1c24c4b.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   background-color: rgb(43, 45, 48);
   overflow: hidden;
 }
@@ -944,7 +958,6 @@ dd {
   font-size: 12px;
 }
 
-
 /* .thubm {
   cursor: pointer;
   color: dodgerblue;
@@ -961,5 +974,7 @@ dd {
   width: 100%;
   border-radius: 10px 10px;
 }
-
+.article_labels li{
+ color: rgb(118, 189, 230);
+}
 </style>

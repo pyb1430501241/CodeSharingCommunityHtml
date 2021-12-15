@@ -109,6 +109,8 @@ export default {
 
 <style scoped>
 #personalcenter {
+  background-repeat:no-repeat;
+  background-attachment:fixed;
   background: url('../assets/0072Vf1pgy1foxlna4bcfj31kw0w0h96.png');
   background-size:100% 100%;
   min-height: calc(100vh - 112px);

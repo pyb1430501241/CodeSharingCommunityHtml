@@ -290,10 +290,12 @@ export default {
 
 <style scoped>
 #content {
-  background-image: url('../assets/cc80d4a7991b4167757a6213fce694f5b1c24c4b.png');
-  background-size:100% 100%;
+  /* background-image: url('../assets/cc80d4a7991b4167757a6213fce694f5b1c24c4b.png');
+  background-size:100% 100%; */
   overflow: hidden;
   display: flex;
+  /* background-repeat:no-repeat;
+  background-attachment:fixed; */
   /* overflow: scroll; */
   min-height: calc(100vh - 112px);
   /* justify-content: center; */
@@ -301,27 +303,27 @@ export default {
 #wenzhang_type {
   position: relative;
   width: 20%;
-  /* background-color: #eeeeee; */
+  background-color: #eeeeee;
   margin: 0;
   padding: 0;
   display: flex;
-  /* box-shadow: 0 10px 10px 0 #333333; */
+  box-shadow: 0 10px 10px 0 #333333;
 }
 #tuijian_wenzhang {
   position: relative;
   width: 60%;
-  /* background-color: #eeeeee; */
-  /* background-color: white; */
+  background-color: #eeeeee;
+  background-color: #eeeeee;
   margin: 0;
   padding: 0;
 }
 #tuijian_yonghu {
   display: flex;
   width: 20%;
-  /* background-color: #eeeeee; */
+  background-color: #eeeeee;
   margin: 0;
   padding: 0;
-  /* box-shadow: 0 10px 10px 0 #333333; */
+  box-shadow: 0 10px 10px 0 #333333;
 }
 
 ul li {

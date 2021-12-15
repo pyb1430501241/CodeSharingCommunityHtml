@@ -14,7 +14,7 @@ const delCookie = (name) => {
     var cookieValue = getCookie(name);
 
     if(cookieValue != null) {
-        ocument.cookie =
+        document.cookie =
             name + "=" + cookieValue + "; path=/;max-age=0" + time + ";expires=" + time.toGMTString() + ";SameSite=lax";
     }
 }

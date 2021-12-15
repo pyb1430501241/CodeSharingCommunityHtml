@@ -8,7 +8,7 @@
         <div class="otherwise">
           <span class="biao">{{ aitem.blob.type }}</span>
           <span>阅读:{{ aitem.visit }}</span>
-          <span>点赞:{{ aitem.thubms }}</span>
+          <span>点赞:{{ aitem.thumbs }}</span>
           <span>收藏:{{ aitem.collection }}</span>
           <span>{{ aitem.blob.createTime }}</span>
         </div>
