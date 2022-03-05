@@ -57,7 +57,7 @@ module.exports = {
                 }
             },
             '/search': {
-                target: 'http://121.199.27.93/search/',
+                target: 'http://localhost/search/',
                 ws: true,
                 changeOrigin: true,
                 pathRewrite: {

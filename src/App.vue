@@ -26,6 +26,7 @@ import Rogon from "./components/Rogon";
 import ChangePassword from "./components/ChangePassword";
 import BlogEditor from "./components/BlogEditor";
 import BlogArticle from "./components/BlogArticle";
+import Search from "./components/Search.vue"
 import axios from "axios";
 
 export default {
@@ -33,13 +34,15 @@ export default {
   // 注册组件
   components: {
     Content,
-    Header,
+    Header, 
+    Search,
     Footer,
     Rogin,
     Rogon,
     ChangePassword,
     BlogEditor,
-    BlogArticle
+    BlogArticle,
+  
   },
   data() {
     return {

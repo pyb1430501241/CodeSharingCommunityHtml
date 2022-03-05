@@ -14,7 +14,7 @@ import BlogArticle from "../components/BlogArticle"
 import PersonalCenter from "../components/PersonalCenter"
 import Author from '../components/Author'
 import PostFile from '../components/PostFile'
-
+import Search from '../components/Search'
 
 const routerPush = Router.prototype.push
 Router.prototype.push = function push(location) {
@@ -46,6 +46,7 @@ export default new Router({
                 { path: 'NotFound', component: NotFound, name: 'NotFound' },
                 { path: "BlogArticle/:webid", component: BlogArticle, name: 'BlogArticle' },
                 { path: "Author/:uid", component: Author, name: 'Author' },
+                { path: "Search/:keyword", component: Search, name: 'Search' }
             ]
         },
         {
@@ -63,6 +64,7 @@ export default new Router({
                 { path: "BlogArticle/:webid", component: BlogArticle, name: 'lBlogArticle' },
                 { path: "Author/:uid", component: Author, name: 'lAuthor' },
                 { path: 'ChangePassword', component: ChangePassword, name: 'ChangePassword' },
+                { path: "Search/:keyword", component: Search, name: 'Search' }
             ]
         }
     ]

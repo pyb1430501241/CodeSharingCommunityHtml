@@ -16,7 +16,7 @@
         </a>
       </li>
       <li>
-        <input type="search" name="search" placeholder="搜索" />
+      <input type="search" name="search" v-model="keyword" placeholder="搜索" @keyup.enter="search"/>
         <!-- <el-button class = "search_button" icon="el-icon-search">搜索</el-button> -->
       </li>
       <li>
@@ -62,6 +62,7 @@ export default {
       username: "username",
       imgsrc: "../assets/prompt.svg",
       user: { username: "username" },
+      keyword:"",
     };
   },
   methods: {
@@ -184,7 +185,7 @@ export default {
             val = false;
             this.$message({
               showClose: true,
-              message: "登录失效，重新登陆",
+              message: "登录失效,重新登陆",
               type: "warning",
             });
             // this.$router.push({ path: "/HelloWorld/Rogon" });
@@ -194,6 +195,9 @@ export default {
           console.log(error);
         });
       return val;
+    },
+    search() {
+      this.$router.push({path : "/LoggingStatus/Search/" + this.keyword});
     },
   },
   mounted() {

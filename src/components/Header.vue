@@ -11,7 +11,13 @@
         </a>
       </li>
       <li>
-        <input type="search" name="search" placeholder="搜索" />
+        <input
+          v-model="keyword"
+          type="search"
+          name="search"
+          placeholder="搜索"
+          @keyup.enter="search"
+        />
       </li>
 
       <li>
@@ -32,12 +38,16 @@ export default {
   data() {
     return {
       title: "Vue Components Demo",
+      keyword: "",
     };
   },
   methods: {
     changego(event) {
       this.$router.push({ path: event });
       // this.$emit("onGoto", event);
+    },
+    search() {
+      this.$router.push({path : "/#/HelloWorld/search/" + this.keyword});
     },
   },
 };
