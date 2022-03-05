@@ -7,11 +7,6 @@
       </li>
       <li>
         <a href="/#/LoggingStatus/Content" target="_blank">
-          <b>首页</b>
-        </a>
-      </li>
-      <li>
-        <a href="/#/LoggingStatus/Content" target="_blank">
           <b>博客</b>
         </a>
       </li>
